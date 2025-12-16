@@ -6,6 +6,14 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		B6B86B042EF1053E00816811 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = B6B86B032EF1053E00816811 /* Kingfisher */; };
+		B6B86B072EF1054800816811 /* ReactorKit in Frameworks */ = {isa = PBXBuildFile; productRef = B6B86B062EF1054800816811 /* ReactorKit */; };
+		B6B86B0A2EF1057500816811 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = B6B86B092EF1057500816811 /* RxCocoa */; };
+		B6B86B0D2EF1057C00816811 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = B6B86B0C2EF1057C00816811 /* Then */; };
+		B6B86B152EF1059700816811 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = B6B86B142EF1059700816811 /* SnapKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		B6B86AC82EF0F6D600816811 /* Unsplash.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Unsplash.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +44,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6B86B0A2EF1057500816811 /* RxCocoa in Frameworks */,
+				B6B86B072EF1054800816811 /* ReactorKit in Frameworks */,
+				B6B86B042EF1053E00816811 /* Kingfisher in Frameworks */,
+				B6B86B0D2EF1057C00816811 /* Then in Frameworks */,
+				B6B86B152EF1059700816811 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +91,11 @@
 			);
 			name = Unsplash;
 			packageProductDependencies = (
+				B6B86B032EF1053E00816811 /* Kingfisher */,
+				B6B86B062EF1054800816811 /* ReactorKit */,
+				B6B86B092EF1057500816811 /* RxCocoa */,
+				B6B86B0C2EF1057C00816811 /* Then */,
+				B6B86B142EF1059700816811 /* SnapKit */,
 			);
 			productName = Unsplash;
 			productReference = B6B86AC82EF0F6D600816811 /* Unsplash.app */;
@@ -107,6 +125,13 @@
 			);
 			mainGroup = B6B86ABF2EF0F6D600816811;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B6B86B022EF1053E00816811 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				B6B86B052EF1054800816811 /* XCRemoteSwiftPackageReference "ReactorKit" */,
+				B6B86B082EF1057500816811 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				B6B86B0B2EF1057C00816811 /* XCRemoteSwiftPackageReference "Then" */,
+				B6B86B132EF1059700816811 /* XCRemoteSwiftPackageReference "SnapKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B6B86AC92EF0F6D600816811 /* Products */;
 			projectDirPath = "";
@@ -345,6 +370,77 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B6B86B022EF1053E00816811 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.6.2;
+			};
+		};
+		B6B86B052EF1054800816811 /* XCRemoteSwiftPackageReference "ReactorKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactorKit/ReactorKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.2.0;
+			};
+		};
+		B6B86B082EF1057500816811 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.9.1;
+			};
+		};
+		B6B86B0B2EF1057C00816811 /* XCRemoteSwiftPackageReference "Then" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/devxoul/Then";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
+		B6B86B132EF1059700816811 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B6B86B032EF1053E00816811 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6B86B022EF1053E00816811 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+		B6B86B062EF1054800816811 /* ReactorKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6B86B052EF1054800816811 /* XCRemoteSwiftPackageReference "ReactorKit" */;
+			productName = ReactorKit;
+		};
+		B6B86B092EF1057500816811 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6B86B082EF1057500816811 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
+		B6B86B0C2EF1057C00816811 /* Then */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6B86B0B2EF1057C00816811 /* XCRemoteSwiftPackageReference "Then" */;
+			productName = Then;
+		};
+		B6B86B142EF1059700816811 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6B86B132EF1059700816811 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B6B86AC02EF0F6D600816811 /* Project object */;
 }
