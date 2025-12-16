@@ -8,13 +8,12 @@
 import UIKit
 import ReactorKit
 
-class SearchViewController: UIViewController, View {
+final class SearchViewController: UIViewController, View {
     var disposeBag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        view.backgroundColor = .white
     }
     
     func bind(reactor: SearchViewReactor) {
