@@ -50,13 +50,18 @@ final class SearchViewReactor: Reactor {
             return Observable.concat([setQuery, images])
         case .loadNextPage:
             guard !currentState.isLoadingNextPage,
-                  let nextPage = currentState.nextPage else {
+                  let nextPage = currentState.nextPage,
+                  let query = currentState.query else {
                 return .empty()
             }
             
             let load = Observable.just(())
                 .flatMapLatest { _ -> Observable<(images: [Image], nextPage: Int?)> in
-                    self.search(query: self.currentState.query, page: nextPage)
+                    if !query.isEmpty {
+                        return self.search(query: query, page: nextPage)
+                    } else {
+                        return self.fetchRandomImages(page: nextPage)
+                    }
                 }
                 .map { Mutation.appendImages($0.images, nextPage: $0.nextPage) }
             
