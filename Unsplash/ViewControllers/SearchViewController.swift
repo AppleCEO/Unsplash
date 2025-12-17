@@ -66,5 +66,26 @@ final class SearchViewController: UIViewController, View {
                 cell.configure(with: model)
             }
             .disposed(by: disposeBag)
+        
+        collectionView.rx.contentOffset
+            .flatMap { [weak collectionView] offset -> Observable<Void> in
+                guard let cv = collectionView else { return .empty() }
+
+                let visibleHeight = cv.frame.height
+                    - cv.contentInset.top
+                    - cv.contentInset.bottom
+
+                let y = offset.y + cv.contentInset.top
+                let threshold = max(
+                    0,
+                    cv.contentSize.height - visibleHeight - 300
+                )
+
+                return y > threshold ? .just(()) : .empty()
+            }
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.loadNextPage }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
 }
