@@ -35,28 +35,34 @@ final class SearchViewReactor: Reactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case let .updateQuery(query):
-            let setQueryMutation = Observable.just(Mutation.setQuery(query))
-            if let query, !query.isEmpty {
-                let searchMutation = self.search(query: query, page: 1)
-                    .take(until: self.action.filter(Action.isUpdateQueryAction))
-                    .map { Mutation.setImages($0.images, nextPage: $0.nextPage) }
-                return Observable.concat([setQueryMutation, searchMutation])
-            } else {
-                let randomMutation = self.fetchRandomImages(page: 1)
-                    .take(until: self.action.filter(Action.isUpdateQueryAction))
-                    .map { Mutation.setImages($0.images, nextPage: $0.nextPage) }
-                return Observable.concat([setQueryMutation, randomMutation])
-            }
+            let setQuery = Observable.just(Mutation.setQuery(query))
+            
+            let images = Observable.just(query)
+                .flatMapLatest { query -> Observable<(images: [Image], nextPage: Int?)> in
+                    if let query, !query.isEmpty {
+                        return self.search(query: query, page: 1)
+                    } else {
+                        return self.fetchRandomImages(page: 1)
+                    }
+                }
+                .map { Mutation.setImages($0.images, nextPage: $0.nextPage) }
+            
+            return Observable.concat([setQuery, images])
         case .loadNextPage:
-            guard !currentState.isLoadingNextPage, let nextPage = currentState.nextPage else {
+            guard !currentState.isLoadingNextPage,
+                  let nextPage = currentState.nextPage else {
                 return .empty()
             }
             
+            let load = Observable.just(())
+                .flatMapLatest { _ -> Observable<(images: [Image], nextPage: Int?)> in
+                    self.search(query: self.currentState.query, page: nextPage)
+                }
+                .map { Mutation.appendImages($0.images, nextPage: $0.nextPage) }
+            
             return Observable.concat([
                 .just(.setLoadingNextPage(true)),
-                self.search(query: currentState.query, page: nextPage)
-                    .take(until: self.action.filter(Action.isUpdateQueryAction))
-                    .map { .appendImages($0.images, nextPage: $0.nextPage) },
+                load,
                 .just(.setLoadingNextPage(false))
             ])
         }
@@ -107,6 +113,7 @@ final class SearchViewReactor: Reactor {
         let emptyResult: ([Image], Int?) = ([], nil)
         guard let url = self.urlForRandom(page: page) else { return .just(emptyResult) }
         return URLSession.shared.rx.json(url: url)
+            .observe(on: MainScheduler.instance)
             .map { json -> ([Image], Int?) in
                 let images = self.parseImages(from: json)
                 let nextPage = page + 1
@@ -124,13 +131,18 @@ final class SearchViewReactor: Reactor {
         guard let items = json as? [[String: Any]] else {
             return []
         }
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        inputFormatter.locale = Locale(identifier: "en_US_POSIX")
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "yyyy/MM/dd HH:mm:ss"
         
         let parsedImages = items.compactMap { item -> Image? in
             guard let id = item["id"] as? String,
-                  let width = item["width"] as? Int,
-                  let height = item["height"] as? Int,
+                  let widthNumber = item["width"] as? NSNumber,
+                  let heightNumber = item["height"] as? NSNumber,
                   let dateString = item["created_at"] as? String,
-                  let createdAt = dateFormatter.date(from: dateString)
+                  let createdAt = inputFormatter.date(from: dateString)
             else {
                 return nil
             }
@@ -141,24 +153,24 @@ final class SearchViewReactor: Reactor {
                 return nil
             }
             
+            guard let urls = item["urls"] as? [String: Any],
+                  let thumb = urls["thumb"] as? String
+            else {
+                return nil
+            }
+            
             return Image(
                 id: id,
+                thumbURL: thumb,
                 author: author,
-                width: width,
-                height: height,
-                createdAt: createdAt
+                width: widthNumber.intValue,
+                height: heightNumber.intValue,
+                createdAt: outputFormatter.string(from: createdAt)
             )
         }
         
         return parsedImages
     }
-    
-    private let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        return formatter
-    }()
 }
 
 extension SearchViewReactor.Action {
