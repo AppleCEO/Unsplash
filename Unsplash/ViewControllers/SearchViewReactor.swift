@@ -90,11 +90,11 @@ final class SearchViewReactor: Reactor {
     
     private func urlForSearch(for query: String?, page: Int) -> URL? {
         guard let query = query, !query.isEmpty else { return nil }
-        return URL(string: "https://api.github.com/search/photos/?query=\(query)&per_page=30&page=\(page)")
+        return URL(string: "https://api.unsplash.com/search/photos/?client_id=BkBIyS1bU4QddtoU0DgwGAoNHzLpHLjB92L_yQy3EPc&per_page=30&page=\(page)&query=\(query)")
     }
     
     private func urlForRandom(page: Int) -> URL? {
-        return URL(string: "https://api.github.com/photos/?per_page=30&page=\(page)")
+        return URL(string: "https://api.unsplash.com/photos/?client_id=BkBIyS1bU4QddtoU0DgwGAoNHzLpHLjB92L_yQy3EPc&per_page=30&page=\(page)")
     }
     
     private func search(query: String?, page: Int) -> Observable<(images: [Image], nextPage: Int?)> {
