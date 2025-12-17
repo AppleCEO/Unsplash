@@ -71,8 +71,8 @@ final class SearchViewController: UIViewController, View {
             .subscribe(onNext: { [weak self, weak reactor] indexPath in
               guard let self else { return }
               self.view.endEditing(true)
-              guard let repo = reactor?.currentState.images[indexPath.row] else { return }
-              let detailViewController = DetailViewController()
+              guard let image = reactor?.currentState.images[indexPath.row] else { return }
+                let detailViewController = DetailViewController(reactor: DetailViewReactor(initialState: .init(image: image)))
               self.navigationController?.pushViewController(detailViewController, animated: true)
             })
             .disposed(by: disposeBag)
