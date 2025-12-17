@@ -111,16 +111,10 @@ final class SearchViewReactor: Reactor {
     private func search(query: String?, page: Int) -> Observable<(images: [Image], nextPage: Int?)> {
         let emptyResult: ([Image], Int?) = ([], nil)
         guard let url = self.urlForSearch(for: query, page: page) else { return .just(emptyResult) }
-        return .just(emptyResult)
-    }
-    
-    private func fetchRandomImages(page: Int) -> Observable<(images: [Image], nextPage: Int?)> {
-        let emptyResult: ([Image], Int?) = ([], nil)
-        guard let url = self.urlForRandom(page: page) else { return .just(emptyResult) }
         return URLSession.shared.rx.json(url: url)
             .observe(on: MainScheduler.instance)
             .map { json -> ([Image], Int?) in
-                let images = self.parseImages(from: json)
+                let images = self.parseSearchImages(from: json)
                 let nextPage = page + 1
                 return (images, nextPage)
             }
@@ -132,49 +126,75 @@ final class SearchViewReactor: Reactor {
             .catchAndReturn(emptyResult)
     }
     
-    func parseImages(from json: Any) -> [Image] {
+    private func fetchRandomImages(page: Int) -> Observable<(images: [Image], nextPage: Int?)> {
+        let emptyResult: ([Image], Int?) = ([], nil)
+        guard let url = self.urlForRandom(page: page) else { return .just(emptyResult) }
+        return URLSession.shared.rx.json(url: url)
+            .observe(on: MainScheduler.instance)
+            .map { json -> ([Image], Int?) in
+                let images = self.parseRandomImages(from: json)
+                let nextPage = page + 1
+                return (images, nextPage)
+            }
+            .do(onError: { error in
+                if case let .some(.httpRequestFailed(response, _)) = error as? RxCocoaURLError, response.statusCode == 403 {
+                    print("⚠️ Unsplash API rate limit exceeded. Try again tomorrow.")
+                }
+            })
+            .catchAndReturn(emptyResult)
+    }
+    
+    func parseSearchImages(from json: Any) -> [Image] {
+        guard let searchResult = json as? [String: Any],
+              let items = searchResult["results"] as? [[String: Any]] else {
+            return []
+        }
+        return items.compactMap { parseImage(item: $0) }
+    }
+    
+    func parseRandomImages(from json: Any) -> [Image] {
         guard let items = json as? [[String: Any]] else {
             return []
         }
+        return items.compactMap { parseImage(item: $0) }
+    }
+    
+    private func parseImage(item: [String: Any]) -> Image? {
         let inputFormatter = DateFormatter()
         inputFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
         inputFormatter.locale = Locale(identifier: "en_US_POSIX")
         let outputFormatter = DateFormatter()
         outputFormatter.dateFormat = "yyyy/MM/dd HH:mm:ss"
         
-        let parsedImages = items.compactMap { item -> Image? in
-            guard let id = item["id"] as? String,
-                  let widthNumber = item["width"] as? NSNumber,
-                  let heightNumber = item["height"] as? NSNumber,
-                  let dateString = item["created_at"] as? String,
-                  let createdAt = inputFormatter.date(from: dateString)
-            else {
-                return nil
-            }
-            
-            guard let user = item["user"] as? [String: Any],
-                  let author = user["id"] as? String
-            else {
-                return nil
-            }
-            
-            guard let urls = item["urls"] as? [String: Any],
-                  let thumb = urls["thumb"] as? String
-            else {
-                return nil
-            }
-            
-            return Image(
-                id: id,
-                thumbURL: thumb,
-                author: author,
-                width: widthNumber.intValue,
-                height: heightNumber.intValue,
-                createdAt: outputFormatter.string(from: createdAt)
-            )
+        guard let id = item["id"] as? String,
+              let widthNumber = item["width"] as? NSNumber,
+              let heightNumber = item["height"] as? NSNumber,
+              let dateString = item["created_at"] as? String,
+              let createdAt = inputFormatter.date(from: dateString)
+        else {
+            return nil
         }
         
-        return parsedImages
+        guard let user = item["user"] as? [String: Any],
+              let author = user["id"] as? String
+        else {
+            return nil
+        }
+        
+        guard let urls = item["urls"] as? [String: Any],
+              let thumb = urls["thumb"] as? String
+        else {
+            return nil
+        }
+        
+        return Image(
+            id: id,
+            thumbURL: thumb,
+            author: author,
+            width: widthNumber.intValue,
+            height: heightNumber.intValue,
+            createdAt: outputFormatter.string(from: createdAt)
+        )
     }
 }
 
