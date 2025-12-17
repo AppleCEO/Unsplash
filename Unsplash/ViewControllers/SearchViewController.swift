@@ -67,6 +67,16 @@ final class SearchViewController: UIViewController, View {
             }
             .disposed(by: disposeBag)
         
+        collectionView.rx.itemSelected
+            .subscribe(onNext: { [weak self, weak reactor] indexPath in
+              guard let self else { return }
+              self.view.endEditing(true)
+              guard let repo = reactor?.currentState.images[indexPath.row] else { return }
+              let detailViewController = DetailViewController()
+              self.navigationController?.pushViewController(detailViewController, animated: true)
+            })
+            .disposed(by: disposeBag)
+        
         collectionView.rx.contentOffset
             .flatMap { [weak collectionView] offset -> Observable<Void> in
                 guard let cv = collectionView else { return .empty() }
