@@ -7,10 +7,11 @@
 
 import Foundation
 
-struct Image: Codable {
+struct Image: Equatable {
     let id: String
+    let thumbURL: String
     let author: String
     let width: Int
     let height: Int
-    let createdAt: Date
+    let createdAt: String
 }
