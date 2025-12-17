@@ -136,12 +136,21 @@ final class SearchViewReactor: Reactor {
                 let nextPage = page + 1
                 return (images, nextPage)
             }
-            .do(onError: { error in
-                if case let .some(.httpRequestFailed(response, _)) = error as? RxCocoaURLError, response.statusCode == 403 {
-                    print("⚠️ Unsplash API rate limit exceeded. Try again tomorrow.")
-                }
-            })
-            .catchAndReturn(emptyResult)
+            .catch { error in
+                print("⚠️ API 실패, mock JSON 사용:", error)
+
+                let mockImages = self.parseRandomImagesFromMock()
+                return .just((mockImages, page + 1))
+            }
+    }
+    
+    private func parseRandomImagesFromMock() -> [Image] {
+        guard let url = Bundle.main.url(forResource: "mock_images", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let jsonObject = try? JSONSerialization.jsonObject(with: data) else {
+            fatalError("❌ mock_images.json 로드 실패")
+        }
+        return parseRandomImages(from: jsonObject)
     }
     
     func parseSearchImages(from json: Any) -> [Image] {
