@@ -153,7 +153,7 @@ final class SearchViewReactor: Reactor {
         return parseRandomImages(from: jsonObject)
     }
     
-    func parseSearchImages(from json: Any) -> [Image] {
+    private func parseSearchImages(from json: Any) -> [Image] {
         guard let searchResult = json as? [String: Any],
               let items = searchResult["results"] as? [[String: Any]] else {
             return []
@@ -161,7 +161,7 @@ final class SearchViewReactor: Reactor {
         return items.compactMap { parseImage(item: $0) }
     }
     
-    func parseRandomImages(from json: Any) -> [Image] {
+    private func parseRandomImages(from json: Any) -> [Image] {
         guard let items = json as? [[String: Any]] else {
             return []
         }
