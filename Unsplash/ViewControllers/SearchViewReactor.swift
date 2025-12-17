@@ -10,20 +10,23 @@ import RxSwift
 
 final class SearchViewReactor: Reactor {
     enum Action {
-        case search(String)
+        case updateQuery(String?)
+        case loadNextPage
     }
     
     enum Mutation {
-        case setSearchResponse
+        case setQuery(String?)
+        case setImages([Image], nextPage: Int?)
+        case appendImages([Image], nextPage: Int?)
+        case setLoadingNextPage(Bool)
     }
     
     struct State {
-        var keyword: String
+        var query: String?
+        var images: [Image] = []
+        var nextPage:Int?
+        var isLoadingNextPage: Bool = false
     }
     
-    let initialState: State
-    
-    init() {
-        self.initialState = State(keyword: "")
-    }
+    let initialState = State()
 }
