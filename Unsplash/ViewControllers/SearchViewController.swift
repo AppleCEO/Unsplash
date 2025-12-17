@@ -8,24 +8,36 @@
 import UIKit
 import ReactorKit
 import SnapKit
+import RxCocoa
 
 final class SearchViewController: UIViewController, View {
-    var disposeBag = DisposeBag()
-    let collectionView: UICollectionView = {
+    private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.minimumLineSpacing = 10
-        
+        let spacing: CGFloat = 1
+        let itemsPerRow: CGFloat = 4
+        let totalSpacing = (spacing * 2) + (spacing * (itemsPerRow - 1))
+        let width = (UIScreen.main.bounds.width - totalSpacing) / itemsPerRow
+        layout.minimumLineSpacing = spacing
+        layout.minimumInteritemSpacing = spacing
+        layout.sectionInset = UIEdgeInsets(top: spacing, left: spacing, bottom: spacing, right: spacing)
+        layout.itemSize = CGSize(width: width, height: width)
         layout.scrollDirection = .vertical
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-       
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        
-        return cv
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .systemBackground
+        collectionView.register(SearchCollectionViewCell.self, forCellWithReuseIdentifier: "SearchCollectionViewCell")
+        return collectionView
     }()
-    let searchBar = UISearchBar()
+    private let searchBar = UISearchBar()
+    var disposeBag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.title = "Search"
+        setupUI()
+    }
+    
+    private func setupUI() {
+        view.backgroundColor = .systemBackground
         [searchBar, collectionView].forEach {
             view.addSubview($0)
         }
@@ -41,7 +53,18 @@ final class SearchViewController: UIViewController, View {
     }
     
     func bind(reactor: SearchViewReactor) {
+        searchBar.rx.text
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .map { Reactor.Action.updateQuery($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
         
+        reactor.state.map { $0.images }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
+            .bind(to: collectionView.rx.items(cellIdentifier: "SearchCollectionViewCell", cellType: SearchCollectionViewCell.self)) { index, model, cell in
+                cell.configure(with: model)
+            }
+            .disposed(by: disposeBag)
     }
-
 }
