@@ -21,10 +21,27 @@ final class BookmarkListViewReactor: Reactor {
     }
     
     let initialState: State
-    private let bookmarkStore: BookmarkStoreType
+    let bookmarkStore: BookmarkStoreType
     
     init(bookmarkStore: BookmarkStoreType = BookmarkStore()) {
         self.bookmarkStore = bookmarkStore
         self.initialState = State(images: bookmarkStore.fetchAll())
+    }
+    
+    func mutate(action: Action) -> Observable<Mutation> {
+        switch action {
+        case .viewWillAppear:
+            let latestImages = bookmarkStore.fetchAll()
+            return .just(.setImages(latestImages))
+        }
+    }
+    
+    func reduce(state: State, mutation: Mutation) -> State {
+        var newState = state
+        switch mutation {
+        case let .setImages(images):
+            newState.images = images
+        }
+        return newState
     }
 }

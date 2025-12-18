@@ -59,5 +59,20 @@ class BookmarkListViewController: UIViewController, View {
                 cell.configure(with: model)
             }
             .disposed(by: disposeBag)
+        
+        collectionView.rx.itemSelected
+            .subscribe(onNext: { [weak self, weak reactor] indexPath in
+                guard let self else { return }
+                self.view.endEditing(true)
+                guard let image = reactor?.currentState.images[indexPath.row],
+                      let bookmarkStore = reactor?.bookmarkStore else { return }
+                let reactor = DetailViewReactor(
+                    image: image,
+                    bookmarkStore: bookmarkStore
+                )
+                let detailViewController = DetailViewController(reactor: reactor)
+                self.navigationController?.pushViewController(detailViewController, animated: true)
+            })
+            .disposed(by: disposeBag)
     }
 }
