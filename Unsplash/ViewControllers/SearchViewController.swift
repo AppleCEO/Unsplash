@@ -92,6 +92,19 @@ final class SearchViewController: UIViewController, View {
             })
             .disposed(by: disposeBag)
         
+        bookmarkButton.rx.tap
+            .map { Reactor.Action.didTapBookmark }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        reactor.state.map { $0.shouldPresentBookmark }
+            .distinctUntilChanged()
+            .filter { $0 }
+            .subscribe(onNext: { [weak self] _ in
+                self?.pushBookmarkViewController()
+            })
+            .disposed(by: disposeBag)
+        
         collectionView.rx.contentOffset
             .flatMap { [weak collectionView] offset -> Observable<Void> in
                 guard let cv = collectionView else { return .empty() }
@@ -112,5 +125,9 @@ final class SearchViewController: UIViewController, View {
             .map { Reactor.Action.loadNextPage }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+    }
+    
+    private func pushBookmarkViewController() {
+        
     }
 }

@@ -14,6 +14,7 @@ final class SearchViewReactor: Reactor {
     enum Action {
         case updateQuery(String?)
         case loadNextPage
+        case didTapBookmark
     }
     
     enum Mutation {
@@ -21,6 +22,7 @@ final class SearchViewReactor: Reactor {
         case setImages([Image], nextPage: Int?)
         case appendImages([Image], nextPage: Int?)
         case setLoadingNextPage(Bool)
+        case setPresentBookmark(Bool)
     }
     
     struct State {
@@ -28,6 +30,7 @@ final class SearchViewReactor: Reactor {
         var images: [Image] = []
         var nextPage:Int?
         var isLoadingNextPage: Bool = false
+        var shouldPresentBookmark: Bool = false
     }
     
     let initialState = State()
@@ -70,33 +73,31 @@ final class SearchViewReactor: Reactor {
                 load,
                 .just(.setLoadingNextPage(false))
             ])
+        case .didTapBookmark:
+            return .concat([
+                .just(.setPresentBookmark(true)),
+                .just(.setPresentBookmark(false))
+            ])
         }
     }
     
     func reduce(state: State, mutation: Mutation) -> State {
+        var newState = state
         switch mutation {
         case let .setQuery(query):
-            var newState = state
             newState.query = query
-            return newState
-            
         case let .setImages(images, nextPage):
-            var newState = state
             newState.images = images
             newState.nextPage = nextPage
-            return newState
-            
         case let .appendImages(images, nextPage):
-            var newState = state
             newState.images.append(contentsOf: images)
             newState.nextPage = nextPage
-            return newState
-            
         case let .setLoadingNextPage(isLoadingNextPage):
-            var newState = state
             newState.isLoadingNextPage = isLoadingNextPage
-            return newState
+        case let .setPresentBookmark(shouldPresent):
+            newState.shouldPresentBookmark = shouldPresent
         }
+        return newState
     }
     
     private func urlForSearch(for query: String?, page: Int) -> URL? {
