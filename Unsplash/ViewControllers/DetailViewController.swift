@@ -9,8 +9,10 @@ import UIKit
 import RxSwift
 import ReactorKit
 import RxCocoa
+import SnapKit
 
 class DetailViewController: UITableViewController, View {
+    let bookmarkButton = BookmarkButton()
     var disposeBag = DisposeBag()
     
     init(reactor: DetailViewReactor) {
@@ -32,6 +34,10 @@ class DetailViewController: UITableViewController, View {
     
     private func setupUI() {
         view.backgroundColor = .systemGray5
+        view.addSubview(bookmarkButton)
+        bookmarkButton.snp.makeConstraints {
+            $0.bottom.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
+        }
     }
     
     func bind(reactor: DetailViewReactor) {
