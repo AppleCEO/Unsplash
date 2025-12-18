@@ -10,6 +10,7 @@ import Foundation
 struct Image: Codable, Equatable {
     let id: String
     let thumbURL: String
+    let imageURL: String
     let author: String
     let width: Int
     let height: Int

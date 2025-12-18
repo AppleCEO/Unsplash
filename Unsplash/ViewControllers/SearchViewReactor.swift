@@ -192,7 +192,8 @@ final class SearchViewReactor: Reactor {
         }
         
         guard let urls = item["urls"] as? [String: Any],
-              let thumb = urls["thumb"] as? String
+              let thumb = urls["thumb"] as? String,
+              let image = urls["regular"] as? String
         else {
             return nil
         }
@@ -200,6 +201,7 @@ final class SearchViewReactor: Reactor {
         return Image(
             id: id,
             thumbURL: thumb,
+            imageURL: image,
             author: author,
             width: widthNumber.intValue,
             height: heightNumber.intValue,

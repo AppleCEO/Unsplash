@@ -37,6 +37,6 @@ final class ImageTableViewCell: UITableViewCell {
     }
     
     func configure(image: Image) {
-         thumbImageView.kf.setImage(with: URL(string: image.thumbURL))
+         thumbImageView.kf.setImage(with: URL(string: image.imageURL))
     }
 }
