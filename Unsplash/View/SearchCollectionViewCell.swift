@@ -10,6 +10,8 @@ import SnapKit
 import Kingfisher
 
 final class SearchCollectionViewCell: UICollectionViewCell {
+    static let identifier = "SearchCollectionViewCell"
+    
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill

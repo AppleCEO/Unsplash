@@ -24,7 +24,7 @@ final class SearchViewController: UIViewController, View {
         layout.scrollDirection = .vertical
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .systemBackground
-        collectionView.register(SearchCollectionViewCell.self, forCellWithReuseIdentifier: "SearchCollectionViewCell")
+        collectionView.register(SearchCollectionViewCell.self, forCellWithReuseIdentifier: SearchCollectionViewCell.identifier)
         return collectionView
     }()
     private let searchBar = UISearchBar()
@@ -62,7 +62,7 @@ final class SearchViewController: UIViewController, View {
         reactor.state.map { $0.images }
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
-            .bind(to: collectionView.rx.items(cellIdentifier: "SearchCollectionViewCell", cellType: SearchCollectionViewCell.self)) { index, model, cell in
+            .bind(to: collectionView.rx.items(cellIdentifier: SearchCollectionViewCell.identifier, cellType: SearchCollectionViewCell.self)) { index, model, cell in
                 cell.configure(with: model)
             }
             .disposed(by: disposeBag)
