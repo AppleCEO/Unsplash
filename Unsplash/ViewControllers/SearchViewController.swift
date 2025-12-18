@@ -12,7 +12,7 @@ import RxCocoa
 import Then
 
 final class SearchViewController: UIViewController, View {
-    private let collectionView: UICollectionView = {
+    private let collectionViewLayout: UICollectionViewLayout = {
         let layout = UICollectionViewFlowLayout()
         let spacing: CGFloat = 1
         let itemsPerRow: CGFloat = 4
@@ -23,7 +23,10 @@ final class SearchViewController: UIViewController, View {
         layout.sectionInset = UIEdgeInsets(top: spacing, left: spacing, bottom: spacing, right: spacing)
         layout.itemSize = CGSize(width: width, height: width)
         layout.scrollDirection = .vertical
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        return layout
+    }()
+    private lazy var collectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.collectionViewLayout)
         collectionView.backgroundColor = .systemBackground
         collectionView.register(SearchCollectionViewCell.self, forCellWithReuseIdentifier: SearchCollectionViewCell.identifier)
         return collectionView
@@ -37,6 +40,7 @@ final class SearchViewController: UIViewController, View {
     ).then {
         $0.tintColor = .systemRed
     }
+    let bookmarkStore = BookmarkStore()
     var disposeBag = DisposeBag()
     
     override func viewDidLoad() {
@@ -79,16 +83,15 @@ final class SearchViewController: UIViewController, View {
         
         collectionView.rx.itemSelected
             .subscribe(onNext: { [weak self, weak reactor] indexPath in
-              guard let self else { return }
-              self.view.endEditing(true)
-              guard let image = reactor?.currentState.images[indexPath.row] else { return }
-                let bookmarkStore = BookmarkStore()
+                guard let self else { return }
+                self.view.endEditing(true)
+                guard let image = reactor?.currentState.images[indexPath.row] else { return }
                 let reactor = DetailViewReactor(
                     image: image,
                     bookmarkStore: bookmarkStore
                 )
                 let detailViewController = DetailViewController(reactor: reactor)
-              self.navigationController?.pushViewController(detailViewController, animated: true)
+                self.navigationController?.pushViewController(detailViewController, animated: true)
             })
             .disposed(by: disposeBag)
         
@@ -108,17 +111,17 @@ final class SearchViewController: UIViewController, View {
         collectionView.rx.contentOffset
             .flatMap { [weak collectionView] offset -> Observable<Void> in
                 guard let cv = collectionView else { return .empty() }
-
+                
                 let visibleHeight = cv.frame.height
-                    - cv.contentInset.top
-                    - cv.contentInset.bottom
-
+                - cv.contentInset.top
+                - cv.contentInset.bottom
+                
                 let y = offset.y + cv.contentInset.top
                 let threshold = max(
                     0,
                     cv.contentSize.height - visibleHeight - 300
                 )
-
+                
                 return y > threshold ? .just(()) : .empty()
             }
             .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
@@ -128,6 +131,16 @@ final class SearchViewController: UIViewController, View {
     }
     
     private func pushBookmarkViewController() {
-        
+        let reactor = BookmarkListViewReactor(
+            bookmarkStore: bookmarkStore
+        )
+        let bookmarkListViewController = BookmarkListViewController(
+            reactor: reactor,
+            collectionViewLayout: collectionViewLayout
+        )
+        self.navigationController?.pushViewController(
+            bookmarkListViewController,
+            animated: true
+        )
     }
 }
