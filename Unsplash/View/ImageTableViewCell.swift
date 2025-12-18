@@ -31,7 +31,8 @@ final class ImageTableViewCell: UITableViewCell {
     private func setupLayout() {
         contentView.addSubview(thumbImageView)
         thumbImageView.snp.makeConstraints {
-            $0.edges.equalTo(contentView)
+            $0.edges.equalToSuperview()
+            $0.height.equalTo(thumbImageView.snp.width)
         }
     }
     

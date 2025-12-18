@@ -37,7 +37,7 @@ final class SearchViewController: UIViewController, View {
     }
     
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGray5
         [searchBar, collectionView].forEach {
             view.addSubview($0)
         }
