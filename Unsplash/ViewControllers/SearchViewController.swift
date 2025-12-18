@@ -9,6 +9,7 @@ import UIKit
 import ReactorKit
 import SnapKit
 import RxCocoa
+import Then
 
 final class SearchViewController: UIViewController, View {
     private let collectionView: UICollectionView = {
@@ -28,11 +29,20 @@ final class SearchViewController: UIViewController, View {
         return collectionView
     }()
     private let searchBar = UISearchBar()
+    private let bookmarkButton = UIBarButtonItem(
+        image: UIImage(systemName: "heart.fill"),
+        style: .plain,
+        target: nil,
+        action: nil
+    ).then {
+        $0.tintColor = .systemRed
+    }
     var disposeBag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "Search"
+        navigationItem.rightBarButtonItem = bookmarkButton
         setupUI()
     }
     
