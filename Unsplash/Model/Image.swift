@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Image: Equatable {
+struct Image: Codable, Equatable {
     let id: String
     let thumbURL: String
     let author: String

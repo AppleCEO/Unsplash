@@ -72,7 +72,12 @@ final class SearchViewController: UIViewController, View {
               guard let self else { return }
               self.view.endEditing(true)
               guard let image = reactor?.currentState.images[indexPath.row] else { return }
-                let detailViewController = DetailViewController(reactor: DetailViewReactor(initialState: .init(image: image)))
+                let bookmarkStore = BookmarkStore()
+                let reactor = DetailViewReactor(
+                    image: image,
+                    bookmarkStore: bookmarkStore
+                )
+                let detailViewController = DetailViewController(reactor: reactor)
               self.navigationController?.pushViewController(detailViewController, animated: true)
             })
             .disposed(by: disposeBag)

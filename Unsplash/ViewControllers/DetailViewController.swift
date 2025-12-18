@@ -30,6 +30,7 @@ class DetailViewController: UITableViewController, View {
         tableView.register(ImageTableViewCell.self, forCellReuseIdentifier: ImageTableViewCell.identifier)
         tableView.register(InfoTableViewCell.self, forCellReuseIdentifier: InfoTableViewCell.identifier)
         setupUI()
+        tableView.reloadData()
     }
     
     private func setupUI() {
@@ -41,10 +42,17 @@ class DetailViewController: UITableViewController, View {
     }
     
     func bind(reactor: DetailViewReactor) {
+        bookmarkButton.rx.tap
+            .map { DetailViewReactor.Action.tapBookmark }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
         reactor.state
+            .map { $0.isBookmarked }
+            .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
-            .bind { [weak self] _ in
-                self?.tableView.reloadData()
+            .bind { [weak self] isLiked in
+                self?.bookmarkButton.setLiked(isLiked, animated: true)
             }
             .disposed(by: disposeBag)
     }

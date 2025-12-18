@@ -9,16 +9,16 @@ import ReactorKit
 
 final class DetailViewReactor: Reactor {
     enum Action {
-        
+        case tapBookmark
     }
     
     enum Mutation {
-        
+        case setBookmarked(Bool)
     }
     
     struct State {
         let image: Image
-        
+        var isBookmarked: Bool
         var infoItems: [DetailInfoItem] {
             [
                 .id(image.id),
@@ -30,8 +30,30 @@ final class DetailViewReactor: Reactor {
     }
     
     var initialState: State
+    private let bookmarkStore: BookmarkStoreType
     
-    init(initialState: State) {
-        self.initialState = initialState
+    init(image: Image, bookmarkStore: BookmarkStoreType = BookmarkStore()) {
+        self.bookmarkStore = bookmarkStore
+        self.initialState = State(
+            image: image,
+            isBookmarked: bookmarkStore.isBookmarked(id: image.id)
+        )
+    }
+    
+    func mutate(action: Action) -> Observable<Mutation> {
+        switch action {
+        case .tapBookmark:
+            let bookmarked = bookmarkStore.toggle(image: currentState.image)
+            return .just(.setBookmarked(bookmarked))
+        }
+    }
+    
+    func reduce(state: State, mutation: Mutation) -> State {
+        var newState = state
+        switch mutation {
+        case let .setBookmarked(bookmarked):
+            newState.isBookmarked = bookmarked
+        }
+        return newState
     }
 }
