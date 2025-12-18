@@ -17,7 +17,16 @@ final class DetailViewReactor: Reactor {
     }
     
     struct State {
-        var image: Image
+        let image: Image
+        
+        var infoItems: [DetailInfoItem] {
+            [
+                .id(image.id),
+                .author(image.author),
+                .size("\(image.width) x \(image.height)"),
+                .createdAt(image.createdAt)
+            ]
+        }
     }
     
     var initialState: State
