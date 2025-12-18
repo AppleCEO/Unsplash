@@ -37,6 +37,11 @@ class BookmarkListViewController: UIViewController, View {
         setupUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        reactor?.action.onNext(.viewWillAppear)
+    }
+    
     private func setupUI() {
         view.backgroundColor = .systemGray5
         view.addSubview(collectionView)

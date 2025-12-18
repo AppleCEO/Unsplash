@@ -9,11 +9,11 @@ import ReactorKit
 
 final class BookmarkListViewReactor: Reactor {
     enum Action {
-        
+        case viewWillAppear
     }
     
     enum Mutation {
-        
+        case setImages([Image])
     }
     
     struct State {
