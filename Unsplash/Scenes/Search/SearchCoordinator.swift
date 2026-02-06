@@ -21,6 +21,19 @@ class SearchCoordinator: Coordinator {
     func start() {
         let searchViewController = SearchViewController()
         searchViewController.reactor = SearchViewReactor()
+        searchViewController.viewDelegate = self
         navigationController.pushViewController(searchViewController, animated: true)
+    }
+}
+
+extension SearchCoordinator: SearchViewDelegate {
+    func goToDetail(reactor: DetailViewReactor) {
+        let detailCoordinator = DetailCoordinator(
+            navigationController: navigationController,
+            reactor: reactor
+        )
+        detailCoordinator.parentCoordinator = self
+        childCoordinators.append(detailCoordinator)
+        detailCoordinator.start()
     }
 }

@@ -40,6 +40,7 @@ final class SearchViewController: UIViewController, View {
     ).then {
         $0.tintColor = .systemRed
     }
+    var viewDelegate: SearchViewDelegate?
     let bookmarkStore = BookmarkStore()
     var disposeBag = DisposeBag()
     
@@ -90,8 +91,7 @@ final class SearchViewController: UIViewController, View {
                     image: image,
                     bookmarkStore: bookmarkStore
                 )
-                let detailViewController = DetailViewController(reactor: reactor)
-                self.navigationController?.pushViewController(detailViewController, animated: true)
+                viewDelegate?.goToDetail(reactor: reactor)
             })
             .disposed(by: disposeBag)
         
@@ -143,4 +143,8 @@ final class SearchViewController: UIViewController, View {
             animated: true
         )
     }
+}
+
+protocol SearchViewDelegate {
+    func goToDetail(reactor: DetailViewReactor)
 }
