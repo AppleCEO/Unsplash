@@ -16,11 +16,11 @@ class BookmarkListViewController: UIViewController, View {
         frame: .zero,
         collectionViewLayout: layout
     )
+    private let collectionViewLayout: UICollectionViewLayout = GridFlowLayout(itemsPerRow: 4, spacing: 1)
     var disposeBag = DisposeBag()
     
     init(
-        reactor: BookmarkListViewReactor,
-        collectionViewLayout: UICollectionViewLayout
+        reactor: BookmarkListViewReactor
     ) {
         self.layout = collectionViewLayout
         super.init(nibName: nil, bundle: nil)

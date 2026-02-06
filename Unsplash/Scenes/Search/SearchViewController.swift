@@ -12,19 +12,7 @@ import RxCocoa
 import Then
 
 final class SearchViewController: UIViewController, View {
-    private let collectionViewLayout: UICollectionViewLayout = {
-        let layout = UICollectionViewFlowLayout()
-        let spacing: CGFloat = 1
-        let itemsPerRow: CGFloat = 4
-        let totalSpacing = (spacing * 2) + (spacing * (itemsPerRow - 1))
-        let width = (UIScreen.main.bounds.width - totalSpacing) / itemsPerRow
-        layout.minimumLineSpacing = spacing
-        layout.minimumInteritemSpacing = spacing
-        layout.sectionInset = UIEdgeInsets(top: spacing, left: spacing, bottom: spacing, right: spacing)
-        layout.itemSize = CGSize(width: width, height: width)
-        layout.scrollDirection = .vertical
-        return layout
-    }()
+    private let collectionViewLayout: UICollectionViewLayout = GridFlowLayout(itemsPerRow: 4, spacing: 1)
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.collectionViewLayout)
         collectionView.backgroundColor = .systemBackground
@@ -104,7 +92,8 @@ final class SearchViewController: UIViewController, View {
             .distinctUntilChanged()
             .filter { $0 }
             .subscribe(onNext: { [weak self] _ in
-                self?.pushBookmarkViewController()
+                guard let self else { return }
+                viewDelegate?.goBookmarkList(bookmarkStore: bookmarkStore)
             })
             .disposed(by: disposeBag)
         
@@ -129,22 +118,9 @@ final class SearchViewController: UIViewController, View {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
-    
-    private func pushBookmarkViewController() {
-        let reactor = BookmarkListViewReactor(
-            bookmarkStore: bookmarkStore
-        )
-        let bookmarkListViewController = BookmarkListViewController(
-            reactor: reactor,
-            collectionViewLayout: collectionViewLayout
-        )
-        self.navigationController?.pushViewController(
-            bookmarkListViewController,
-            animated: true
-        )
-    }
 }
 
 protocol SearchViewDelegate {
     func goToDetail(reactor: DetailViewReactor)
+    func goBookmarkList(bookmarkStore: BookmarkStore)
 }

@@ -36,4 +36,14 @@ extension SearchCoordinator: SearchViewDelegate {
         childCoordinators.append(detailCoordinator)
         detailCoordinator.start()
     }
+    
+    func goBookmarkList(bookmarkStore: BookmarkStore) {
+        let bookmarkListCoordinator = BookmarkListCoordinator(
+            navigationController: navigationController,
+            bookmarkStore: bookmarkStore
+        )
+        bookmarkListCoordinator.parentCoordinator = self
+        childCoordinators.append(bookmarkListCoordinator)
+        bookmarkListCoordinator.start()
+    }
 }
