@@ -14,9 +14,9 @@ class AppCoordinator: Coordinator {
     private let window: UIWindow?
     
     lazy var navigationController: UINavigationController = {
-        let searchViewController = SearchViewController()
-        searchViewController.reactor = SearchViewReactor()
-        let navigationController = UINavigationController(rootViewController: searchViewController)
+        let rootViewController = UIViewController()
+        rootViewController.view.backgroundColor = .white
+        let navigationController = UINavigationController(rootViewController: rootViewController)
         return navigationController
     }()
     
@@ -30,5 +30,14 @@ class AppCoordinator: Coordinator {
         }
         window.rootViewController = navigationController
         window.makeKeyAndVisible()
+        
+        goToSearchPage()
+    }
+    
+    func goToSearchPage() {
+        let searchCoordinator = SearchCoordinator(navigationController: navigationController)
+        searchCoordinator.parentCoordinator = self
+        addChildCoordinator(searchCoordinator)
+        searchCoordinator.start()
     }
 }
